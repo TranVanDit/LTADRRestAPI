@@ -8,7 +8,11 @@ const database = require('./config/db');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRoutes');
-var distributorRoutes = require('./routes/distributorRoutes')
+var distributorsRoute = require('./routes/distributorRoutes')
+var fruitsRouter = require('./routes/fruitRouters')
+var uploadRouter = require('./routes/uploadRoutes')
+var emailRouter = require('./routes/emailRoutes')
+var loginRouter = require('./routes/loginRoutes')
 
 var app = express();
 
@@ -24,7 +28,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/distributor',distributorRoutes)
+app.use('/distributors',distributorsRoute)
+app.use('/fruits',fruitsRouter)
+app.use('/uploads',uploadRouter)
+app.use('/sendmail',emailRouter)
+app.use('/login',loginRouter)
 //Connect database
 database.connect();
 

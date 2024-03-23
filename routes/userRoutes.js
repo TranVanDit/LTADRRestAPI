@@ -1,42 +1,51 @@
 var express = require('express');
 var router = express.Router();
 const modelUser = require('../models/user');
+const Transporter = require('../config/mail');
+const Upload = require('../config/upload');
 
 router.get('/test', function(req, res, next){
     res.send('respond with a resource user test');
 });
-//add data 
-router.post ('/add', async(req, res) => {
-    try{
+
+
+//add data
+//đăng ký thành công
+router.post('/add',Upload.array('avatar'),async(req,res)=>{
+    try {
+        const {file} = req
+        const urlImages = `${req.protocol}://${req.get('host')}/uploads/${file.filename}`
+
         const model = new modelUser(req.body)
-        const result = await model.save();// them du lieu vao db
-        if(result){
-            res.json({
-                "status": 200,
-                "message":"Thêm thành công",
-                "data": result
-            })
-        }else{
-            res.json({
-                "status": 400,
-                "message":"Thêm thất bại",
-                "data": []
-            })
+        model.avatar = urlImages
+        const result = await model.save(); // theem du lieu vao DB
+       if(result){
+        const mailOption ={
+            from : 'tranvandit10102002@gmail.com',
+            to: model.email, //email người đăng ký
+            subject:'Welcom to Notejs ',
+            text :'Chúc mừng đăng ký thành công'
         }
-        // res.send(result)
-    } catch (error){
+        await Transporter.sendMail(mailOption)
+        res.json({
+            "status":200,
+            "message": "Thêm thanh công",
+            "data": result
+        })
+       }else{
+        res.json({
+            "status":400,
+            "message": "Thêm thất bại",
+            "data": []
+        })
+        
+       }
+    } catch(error) {
         console.log(error);
+
     }
 })
 
-router.get('/list',async(req, res)=>{
-    const result = await modelUser.find({})
-    try{
-        res.send(result)
-    }catch(error){
-        console.log(error);
-    }
-})
 /*----------------------getByID-----------------*/
 router.get('/getbyid/:id',async(req, res)=>{
    
